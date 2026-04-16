@@ -7,7 +7,7 @@ A minimal Python service that fetches the last ~20 posts from a public Instagram
 
 Per post it captures **publication date, caption, and media URLs** (supports single images, videos, and carousels).
 
-Built for a digital-legacy product that preserves a person's social-media presence after their death. This submission is the "week-one spike" — working code + decisions I'd explain to a co-founder, not a production system.
+Built for a digital-legacy product that preserves a person's social-media presence after their death. This submission is the "week-one spike" — working code + decisions I'd explain to a co-founder, not a production system. The broader product vision — who it's for, what we believe, what MVP looks like — is in [docs/VISION.md](docs/VISION.md). This README focuses on the technical approach.
 
 ---
 
