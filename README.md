@@ -217,3 +217,4 @@ Five concrete next steps in the order I'd take them:
 - [Instagram Basic Display API deprecation (Meta, Sept 2024)](https://developers.facebook.com/blog/post/2024/09/04/update-on-instagram-basic-display-api/)
 - [Scrapfly: How to Scrape Instagram in 2026](https://scrapfly.io/blog/posts/how-to-scrape-instagram) — landscape confirmation
 - [hiQ Labs v. LinkedIn](https://en.wikipedia.org/wiki/HiQ_Labs_v._LinkedIn) — US precedent on public-data scraping
+<img width="2535" height="2016" alt="image" src="https://github.com/user-attachments/assets/aa9d4a74-21c9-4db7-8dce-9a5815f06872" />
