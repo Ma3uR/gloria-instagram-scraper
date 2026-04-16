@@ -25,14 +25,16 @@ cp .env.example .env
 # 3. Fetch the feed (defaults to @gloriya_glor)
 python fetch.py
 # or: python fetch.py some_other_handle
+# → writes posts.json + gallery.html, opens the gallery in your browser
+# (set NO_OPEN=1 to skip auto-opening, e.g. in CI)
 
-# 4. Serve the feed
+# 4. (Optional) serve the feed over HTTP for a frontend
 uvicorn api:app --reload
 curl http://localhost:8000/posts | jq '.posts | length'   # → 20
 curl http://localhost:8000/health
 ```
 
-`posts.json` is committed to this repo as a demo artifact so a reviewer can explore the shape without needing an Apify token.
+`posts.json` and `gallery.html` are committed to this repo as demo artifacts so a reviewer can explore the output without needing an Apify token. Just open `gallery.html` in a browser to see all 20 posts rendered as a grid.
 
 ### Output schema
 
