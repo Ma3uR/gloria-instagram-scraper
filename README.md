@@ -25,7 +25,8 @@ cp .env.example .env
 # 3. Fetch the feed (defaults to @gloriya_glor)
 python fetch.py
 # or: python fetch.py some_other_handle
-# → writes posts.json + gallery.html, opens the gallery in your browser
+# → writes posts.json + gallery.html, downloads media into media/,
+#   and opens the gallery in your browser.
 # (set NO_OPEN=1 to skip auto-opening, e.g. in CI)
 
 # 4. (Optional) serve the feed over HTTP for a frontend
@@ -34,7 +35,11 @@ curl http://localhost:8000/posts | jq '.posts | length'   # → 20
 curl http://localhost:8000/health
 ```
 
-`posts.json` and `gallery.html` are committed to this repo as demo artifacts so a reviewer can explore the output without needing an Apify token. Just open `gallery.html` in a browser to see all 20 posts rendered as a grid.
+`posts.json` and `gallery.html` are committed so a reviewer can see the shape without a token. `media/` is not committed (it's third-party user content, ~7 MB per full fetch) — running `python fetch.py` regenerates it. The `url` field in each post points at the local `media/` path; the original IG CDN URL is preserved in `source_url`.
+
+### Why we rehost media bytes instead of just storing URLs
+
+Instagram's CDN returns images with `Cross-Origin-Resource-Policy: same-origin`, which means browsers refuse to render them on any page not served from `instagram.com` — including a `file://` gallery and any production frontend we'd build. Videos happen to use `cross-origin` CORP so they work, but images don't. On top of that, the URLs are signed and expire in roughly two weeks. For a digital-legacy product that promises to preserve this content *forever*, storing bytes is the correct move, not an optimization. This is the same "media rehosting" requirement called out in the scale section below.
 
 ### Output schema
 

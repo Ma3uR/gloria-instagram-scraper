@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import html
 import json
+import mimetypes
 import os
 import sys
+import urllib.parse
+import urllib.request
 import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +25,7 @@ LIMIT = 20
 APIFY_ACTOR_ID = "apify/instagram-scraper"
 OUTPUT_PATH = Path(__file__).parent / "posts.json"
 GALLERY_PATH = Path(__file__).parent / "gallery.html"
+MEDIA_DIR = Path(__file__).parent / "media"
 
 
 def normalize_post(raw: dict) -> dict | None:
@@ -111,6 +115,44 @@ def fetch(username: str, limit: int = LIMIT) -> dict:
         "apify_run_id": run_id,
         "posts": posts,
     }
+
+
+def _guess_extension(url: str, media_type: str) -> str:
+    """Pick a filename extension from the URL path, falling back by type."""
+    path = urllib.parse.urlparse(url).path
+    for ext in (".jpg", ".jpeg", ".png", ".webp", ".mp4", ".mov"):
+        if path.lower().endswith(ext):
+            return ext
+    guessed = mimetypes.guess_extension(f"{media_type}/*") or ""
+    return guessed or (".mp4" if media_type == "video" else ".jpg")
+
+
+def download_media(feed: dict, dest: Path = MEDIA_DIR) -> dict:
+    """Download each post's media to dest/<shortcode>/<n><ext> and rewrite URLs.
+
+    Keeps the original IG CDN URL as `source_url` so downstream consumers can
+    tell what was rehosted. Idempotent: skips files that already exist.
+    """
+    dest.mkdir(exist_ok=True)
+    total = sum(len(p["media"]) for p in feed["posts"])
+    done = 0
+    for post in feed["posts"]:
+        post_dir = dest / (post.get("shortcode") or "unknown")
+        post_dir.mkdir(exist_ok=True)
+        for i, m in enumerate(post["media"]):
+            ext = _guess_extension(m["url"], m.get("type", "image"))
+            target = post_dir / f"{i}{ext}"
+            if not target.exists():
+                try:
+                    urllib.request.urlretrieve(m["url"], target)
+                except Exception as exc:
+                    print(f"[warn] failed to download {m['url'][:60]}…: {exc}", file=sys.stderr)
+                    continue
+            m["source_url"] = m["url"]
+            m["url"] = str(target.relative_to(dest.parent))
+            done += 1
+            print(f"  [{done}/{total}] {target.relative_to(dest.parent)}")
+    return feed
 
 
 def _format_date(iso: str | None) -> str:
@@ -234,6 +276,13 @@ def render_gallery(feed: dict) -> str:
 def main() -> None:
     username = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_USERNAME
     feed = fetch(username)
+
+    # Rehost media locally so the gallery works offline and doesn't depend on
+    # IG CDN URLs (which expire in weeks AND set CORP: same-origin, blocking
+    # images from rendering on a file:// page).
+    print(f"Downloading media → {MEDIA_DIR.name}/ ...")
+    feed = download_media(feed)
+
     OUTPUT_PATH.write_text(
         json.dumps(feed, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
