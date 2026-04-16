@@ -15,8 +15,7 @@ from pathlib import Path
 from apify_client import ApifyClient
 from dotenv import load_dotenv
 
-# TODO: Replace "gloria" with Gloria's real Instagram handle before submission.
-DEFAULT_USERNAME = "gloria"
+DEFAULT_USERNAME = "gloriya_glor"  # https://www.instagram.com/gloriya_glor/
 LIMIT = 20
 APIFY_ACTOR_ID = "apify/instagram-scraper"
 OUTPUT_PATH = Path(__file__).parent / "posts.json"

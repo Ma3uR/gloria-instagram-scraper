@@ -22,7 +22,7 @@ cp .env.example .env
 # Edit .env and paste your token from https://console.apify.com/account/integrations
 # (free tier includes $5/mo in credits — ~2000 Instagram posts)
 
-# 3. Fetch the feed (defaults to @gloria — replace in fetch.py's DEFAULT_USERNAME)
+# 3. Fetch the feed (defaults to @gloriya_glor)
 python fetch.py
 # or: python fetch.py some_other_handle
 
@@ -38,7 +38,7 @@ curl http://localhost:8000/health
 
 ```json
 {
-  "username": "gloria",
+  "username": "gloriya_glor",
   "fetched_at": "2026-04-17T12:34:56+00:00",
   "source": "apify",
   "apify_actor": "apify/instagram-scraper",
@@ -179,7 +179,7 @@ And one shape choice that pays off later: the normalizer output is already platf
 
 ## Honest limitations of this submission
 
-- Single hardcoded username (`DEFAULT_USERNAME = "gloria"` in `fetch.py`). Replace with the real handle before running.
+- Single hardcoded username (`DEFAULT_USERNAME = "gloriya_glor"` in `fetch.py`). Override by passing an argument: `python fetch.py another_handle`.
 - No database. JSON file only. Fine for the demo; deliberately not built out (see scale section).
 - **Media URLs expire** (IG CDN). The `posts.json` committed here will show broken images in a few weeks. Production fix described in scale section; out of scope here to keep the implementation under 4 hours.
 - No scheduled fetches. One-shot CLI only.
